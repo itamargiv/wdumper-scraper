@@ -33,7 +33,12 @@ The notebook generates a CSV file where each row represents a dump and includes 
    pip install -r requirements-dev.txt
    ```
 
-4. **Launch the notebook**
+4. **Install the git filter to strip notebook outputs before commits**
+   ```bash
+   nbstripout --install --attributes .gitattributes
+   ```
+
+5. **Launch the notebook**
    ```bash
    jupyter notebook notebook.ipynb
    ```
