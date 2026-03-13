@@ -1,5 +1,6 @@
 from wdumper_scraper.scraper import Scraper, CacheDuration
 from wdumper_scraper.recent_dumps_page import RecentDumpsPage
+from wdumper_scraper.dump_info_page import DumpInfoPage
 
-__all__ = ['Scraper', 'CacheDuration', 'RecentDumpsPage']
+__all__ = ['Scraper', 'CacheDuration', 'RecentDumpsPage', 'DumpInfoPage']
 

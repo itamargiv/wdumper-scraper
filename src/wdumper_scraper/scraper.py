@@ -12,7 +12,7 @@ class CacheDuration(Enum):
 
 
 class Scraper:
-    def __init__(self, session: CachedSession) -> None:
+    def __init__(self, session: CachedSession, log: bool = False) -> None:
         self.__session = session
         self.__log = log
 
