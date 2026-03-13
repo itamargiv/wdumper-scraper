@@ -43,6 +43,12 @@ The notebook generates a CSV file where each row represents a dump and includes 
    jupyter notebook notebook.ipynb
    ```
 
+## Testing
+
+```bash
+pytest
+```
+
 ## Google Colab
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/itamargiv/wdumper-scraper/blob/main/notebook.ipynb)

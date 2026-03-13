@@ -1,4 +1,6 @@
 -r requirements.txt
 jupyter
 nbstripout
+pytest
+pytest-mock
 
