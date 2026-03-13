@@ -1,0 +1,33 @@
+from enum import Enum
+from requests_cache import CachedSession
+from bs4 import BeautifulSoup
+
+class CacheDuration(Enum):
+    NO_CACHE = 0
+    SHORT = 7200
+    INDEFINITE = None
+
+
+class Scraper:
+    def __init__(self, session: CachedSession) -> None:
+        self.__session = session
+
+    def __get(
+            self,
+            url: str,
+            cache_duration: CacheDuration
+    ) -> str:
+        response = self.__session.get(url, expire_after=cache_duration.value)
+
+        if response.status_code != 200:
+            raise Exception(f"Status Code: {response.status_code}")
+
+        return response.text
+
+    def scrape(
+            self,
+            url: str,
+            cache_duration: CacheDuration  = CacheDuration.NO_CACHE
+    ) -> BeautifulSoup:
+        html = self.__get(url, cache_duration)
+        return BeautifulSoup(html, 'html.parser')
