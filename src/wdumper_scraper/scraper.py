@@ -14,6 +14,7 @@ class CacheDuration(Enum):
 class Scraper:
     def __init__(self, session: CachedSession) -> None:
         self.__session = session
+        self.__log = log
 
     def __get(
             self,
@@ -21,6 +22,9 @@ class Scraper:
             cache_duration: CacheDuration
     ) -> str:
         response = self.__session.get(url, expire_after=cache_duration.value)
+
+        if self.__log:
+            print(f"Cache {'HIT' if response.from_cache else 'MISS'} for URL: {url}")
 
         if response.status_code != 200:
             raise Exception(f"Status Code: {response.status_code}")
