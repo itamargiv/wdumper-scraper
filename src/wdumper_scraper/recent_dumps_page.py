@@ -1,4 +1,7 @@
-from Scraper import Scraper
+from wdumper_scraper.scraper import Scraper
+
+__all__ = ['RecentDumpsPage']
+
 
 class RecentDumpsPage:
     def __init__(self, scraper: Scraper) -> None:
@@ -9,3 +12,4 @@ class RecentDumpsPage:
         dump_id = self.__soup.find("table").find("a")["href"].split("/")[-1]
 
         return int(dump_id)
+

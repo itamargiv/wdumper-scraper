@@ -2,6 +2,9 @@ from enum import Enum
 from requests_cache import CachedSession
 from bs4 import BeautifulSoup
 
+__all__ = ['Scraper', 'CacheDuration']
+
+
 class CacheDuration(Enum):
     NO_CACHE = 0
     SHORT = 7200
@@ -27,7 +30,8 @@ class Scraper:
     def scrape(
             self,
             url: str,
-            cache_duration: CacheDuration  = CacheDuration.NO_CACHE
+            cache_duration: CacheDuration = CacheDuration.NO_CACHE
     ) -> BeautifulSoup:
         html = self.__get(url, cache_duration)
         return BeautifulSoup(html, 'html.parser')
+

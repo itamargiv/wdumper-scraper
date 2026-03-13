@@ -10,6 +10,24 @@ The notebook generates a CSV file where each row represents a dump and includes 
 - Labels, descriptions, aliases, sitelinks (yes/no)
 - Languages
 
+## Project Structure
+
+```
+wdumper-scraper/
+├── src/
+│   └── wdumper_scraper/       # Source package
+│       ├── __init__.py        # Re-exports all public symbols
+│       ├── scraper.py         # Scraper and CacheDuration classes
+│       └── recent_dumps_page.py  # RecentDumpsPage class
+├── tests/
+│   ├── conftest.py            # Shared pytest fixtures
+│   ├── test_scraper.py
+│   └── test_recent_dumps_page.py
+├── notebook.ipynb             # Main analysis notebook
+├── pyproject.toml             # Project metadata, dependencies, and build config
+└── pytest.ini                 # Pytest configuration
+```
+
 ## Prerequisites
 
 - Python 3.10+
@@ -30,7 +48,7 @@ The notebook generates a CSV file where each row represents a dump and includes 
 
 3. **Install dependencies**
    ```bash
-   pip install -r requirements-dev.txt
+   pip install -e ".[dev]"
    ```
 
 4. **Install the git filter to strip notebook outputs before commits**
@@ -54,4 +72,3 @@ pytest
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/itamargiv/wdumper-scraper/blob/main/notebook.ipynb)
 
 The notebook includes a setup cell that automatically clones the repository and installs dependencies when run in Colab — no manual setup required.
-

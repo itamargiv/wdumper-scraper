@@ -1,5 +1,5 @@
 import pytest
-from Scraper import Scraper
+from wdumper_scraper import Scraper
 
 
 @pytest.fixture

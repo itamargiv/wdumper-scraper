@@ -1,5 +1,5 @@
 import pytest
-from RecentDumpsPage import RecentDumpsPage
+from wdumper_scraper import RecentDumpsPage
 
 SINGLE_ROW_HTML = '<table><tr><td><a href="/dump/42">Dump 42</a></td></tr></table>'
 MULTI_ROW_HTML = (
