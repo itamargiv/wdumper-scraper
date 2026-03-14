@@ -1,11 +1,12 @@
 import pytest
-from wdumper_scraper import DumpInfoPage
+from wdumper_scraper import DumpInfoPage, ScraperError, PageError
 
 DUMP_ID = 42
 WITH_H2_HTML = "<h2>My Dump</h2><p>some content</p>"
 WITHOUT_H2_HTML = "<p>some content</p>"
 WITH_SPEC_HTML = '<h2>Spec</h2><pre>{"key": "value"}</pre>'
 WITH_SPEC_HEADING_BUT_NO_PRE_HTML = "<h2>Spec</h2>"
+INVALID_JSON_SPEC_HTML = '<h2>Spec</h2><pre>not valid json</pre>'
 
 
 def test_scrape_called_with_correct_url(make_scraper, mocker):
@@ -41,7 +42,7 @@ def test_extract_name_returns_empty_string_when_no_h2(make_scraper):
 
 def test_init_raises_on_bad_status(make_scraper):
     scraper = make_scraper(status_code=404)
-    with pytest.raises(Exception, match="404"):
+    with pytest.raises(ScraperError):
         DumpInfoPage(scraper, DUMP_ID)
 
 
@@ -61,5 +62,22 @@ def test_extract_spec_returns_none_when_spec_heading_has_no_pre(make_scraper):
     scraper = make_scraper(body=WITH_SPEC_HEADING_BUT_NO_PRE_HTML)
     page = DumpInfoPage(scraper, DUMP_ID)
     assert page.extract_spec() is None
+
+
+def test_extract_spec_raises_page_error_on_invalid_json(make_scraper):
+    scraper = make_scraper(body=INVALID_JSON_SPEC_HTML)
+    page = DumpInfoPage(scraper, DUMP_ID)
+    with pytest.raises(PageError):
+        page.extract_spec()
+
+
+def test_extract_spec_raises_page_error_on_attribute_error(make_scraper, mocker):
+    scraper = make_scraper(body=WITH_SPEC_HTML)
+    page = DumpInfoPage(scraper, DUMP_ID)
+    mock_soup = mocker.MagicMock()
+    mock_soup.find.side_effect = AttributeError("soup broken")
+    page._DumpInfoPage__soup = mock_soup
+    with pytest.raises(PageError):
+        page.extract_spec()
 
 

@@ -1,15 +1,16 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import NamedTuple
+from typing import NamedTuple, Any
 from wdumper_scraper.dump_info import DumpInfo
 from wdumper_scraper.dump_info_page import DumpInfoPage
+from wdumper_scraper.exceptions import WDumperError
 from wdumper_scraper.recent_dumps_page import RecentDumpsPage
 from wdumper_scraper.scraper import CacheDuration, Scraper
 
 __all__ = ["DumpsInfoLoader", "ScrapeResult"]
 
 class ScrapeResult(NamedTuple):
-    dumps: list[DumpInfo] = []
-    skipped: list[dict] = []
+    dumps: list[dict[str, Any]]
+    skipped: list[dict[str, Any]]
 
 class DumpsInfoLoader:
     def __init__(self, scraper: Scraper, max_workers: int = 5) -> None:
@@ -26,11 +27,12 @@ class DumpsInfoLoader:
         return DumpInfo(dump_info_page)
 
     def scrape(self) -> ScrapeResult:
-        results = ScrapeResult(dumps=[], skipped=[])
+        dumps = []
+        skipped = []
 
         last_id = RecentDumpsPage(self.__scraper).extract_last_id()
 
-        with (ThreadPoolExecutor(max_workers=self.__max_workers) as executor):
+        with ThreadPoolExecutor(max_workers=self.__max_workers) as executor:
             futures = {
                 executor.submit(self.__scrape_dump, last_id, i): i
                 for i in range(last_id, 0, -1)
@@ -41,9 +43,13 @@ class DumpsInfoLoader:
 
                 try:
                     dump_info = future.result()
-                except Exception as e:
-                    results.skipped.append({"id": dump_id, "error": str(e)})
+                except WDumperError as e:
+                    skipped.append({"id": dump_id, "error": str(e)})
                 else:
-                    results.dumps.append(dump_info.data)
+                    dumps.append(dump_info.data)
 
-        return results
+        return ScrapeResult(
+            dumps=sorted(dumps, key=lambda d: d["id"], reverse=True),
+            skipped=sorted(skipped, key=lambda s: s["id"], reverse=True),
+        )
+

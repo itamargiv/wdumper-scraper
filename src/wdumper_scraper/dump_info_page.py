@@ -1,5 +1,6 @@
 import json
 
+from wdumper_scraper.exceptions import PageError
 from wdumper_scraper.scraper import Scraper, CacheDuration
 
 __all__ = ['DumpInfoPage']
@@ -29,9 +30,11 @@ class DumpInfoPage:
         return heading.get_text(strip = True) if heading else ""
 
     def extract_spec(self) -> dict | None:
-        # noinspection PyTypeChecker
-        heading = self.__soup.find("h2", string="Spec")
-        pre = heading.find_next("pre") if heading else None
-        content = pre.get_text(strip = True) if pre else None
-
-        return json.loads(content) if content else None
+        try:
+            # noinspection PyTypeChecker
+            heading = self.__soup.find("h2", string="Spec")
+            pre = heading.find_next("pre") if heading else None
+            content = pre.get_text(strip=True) if pre else None
+            return json.loads(content) if content else None
+        except (json.JSONDecodeError, AttributeError) as e:
+            raise PageError(str(e)) from e

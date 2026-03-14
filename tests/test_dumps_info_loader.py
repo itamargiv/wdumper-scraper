@@ -1,5 +1,5 @@
 import pytest
-from wdumper_scraper import DumpsInfoLoader
+from wdumper_scraper import DumpsInfoLoader, ScraperError
 
 LAST_ID = 3
 
@@ -49,7 +49,7 @@ def test_scrape_successful_dumps_appear_in_dumps(make_loader):
 
 
 def test_scrape_exception_populates_skipped(make_loader):
-    error = Exception("Not found")
+    error = ScraperError("Not found")
     loader = make_loader(last_id=LAST_ID, side_effects={2: error})
     result = loader.scrape()
     assert len(result.dumps) == LAST_ID - 1
@@ -59,7 +59,7 @@ def test_scrape_exception_populates_skipped(make_loader):
 
 
 def test_scrape_skipped_contains_id_and_error_keys(make_loader):
-    loader = make_loader(last_id=1, side_effects={1: Exception("boom")})
+    loader = make_loader(last_id=1, side_effects={1: ScraperError("boom")})
     result = loader.scrape()
     assert set(result.skipped[0].keys()) == {"id", "error"}
 
@@ -81,7 +81,7 @@ def test_scrape_dumps_are_sorted_by_id_descending(make_loader):
 
 
 def test_scrape_skipped_are_sorted_by_id_descending(make_loader):
-    loader = make_loader(last_id=LAST_ID, side_effects={i: Exception("boom") for i in range(1, LAST_ID + 1)})
+    loader = make_loader(last_id=LAST_ID, side_effects={i: ScraperError("boom") for i in range(1, LAST_ID + 1)})
     result = loader.scrape()
     ids = [entry["id"] for entry in result.skipped]
     assert ids == sorted(ids, reverse=True)
