@@ -12,31 +12,18 @@ MIXED_SPEC = {
 }
 
 
-@pytest.fixture
-def make_page(mocker):
-    def factory(dump_id=DUMP_ID, name=DUMP_NAME, url=DUMP_URL, spec=MIXED_SPEC):
-        page = mocker.MagicMock()
-        page.dump_id = dump_id
-        page.url = url
-        page.extract_name.return_value = name
-        page.extract_spec.return_value = spec
-        return page
-
-    return factory
-
-
 def test_data_contains_id(make_page):
-    page = make_page()
+    page = make_page(dump_id=DUMP_ID, name=DUMP_NAME, url=DUMP_URL, spec=MIXED_SPEC)
     assert DumpInfo(page).data["id"] == DUMP_ID
 
 
 def test_data_contains_name(make_page):
-    page = make_page()
+    page = make_page(dump_id=DUMP_ID, name=DUMP_NAME, url=DUMP_URL, spec=MIXED_SPEC)
     assert DumpInfo(page).data["name"] == DUMP_NAME
 
 
 def test_data_contains_url(make_page):
-    page = make_page()
+    page = make_page(dump_id=DUMP_ID, name=DUMP_NAME, url=DUMP_URL, spec=MIXED_SPEC)
     assert DumpInfo(page).data["url"] == DUMP_URL
 
 

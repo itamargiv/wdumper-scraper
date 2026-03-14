@@ -19,12 +19,16 @@ wdumper-scraper/
 │       ├── __init__.py        # Re-exports all public symbols
 │       ├── scraper.py         # Scraper and CacheDuration classes
 │       ├── recent_dumps_page.py  # RecentDumpsPage class
-│       └── dump_info_page.py  # DumpInfoPage class
+│       ├── dump_info_page.py  # DumpInfoPage class
+│       ├── dump_info.py       # DumpInfo class
+│       └── dumps_info_loader.py  # DumpsInfoLoader and ScrapeResult
 ├── tests/
 │   ├── conftest.py            # Shared pytest fixtures
 │   ├── test_scraper.py
 │   ├── test_recent_dumps_page.py
-│   └── test_dump_info_page.py
+│   ├── test_dump_info_page.py
+│   ├── test_dump_info.py
+│   └── test_dumps_info_loader.py
 ├── notebook.ipynb             # Main analysis notebook
 ├── pyproject.toml             # Project metadata, dependencies, and build config
 └── pytest.ini                 # Pytest configuration
