@@ -1,3 +1,4 @@
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import NamedTuple, Any
 from wdumper_scraper.dump_info import DumpInfo
@@ -26,16 +27,14 @@ class DumpsInfoLoader:
         dump_info_page = DumpInfoPage(self.__scraper, dump_id, cache_duration)
         return DumpInfo(dump_info_page)
 
-    def scrape(self) -> ScrapeResult:
+    def __scrape_ids(self, last_id: int, ids) -> ScrapeResult:
         dumps = []
         skipped = []
-
-        last_id = RecentDumpsPage(self.__scraper).extract_last_id()
 
         with ThreadPoolExecutor(max_workers=self.__max_workers) as executor:
             futures = {
                 executor.submit(self.__scrape_dump, last_id, i): i
-                for i in range(last_id, 0, -1)
+                for i in ids
             }
 
             for future in as_completed(futures):
@@ -53,3 +52,20 @@ class DumpsInfoLoader:
             skipped=sorted(skipped, key=lambda s: s["id"], reverse=True),
         )
 
+    def scrape(self, max_retries: int = 0, retry_delay: float = 5.0) -> ScrapeResult:
+        last_id = RecentDumpsPage(self.__scraper).extract_last_id()
+        result = self.__scrape_ids(last_id, range(last_id, 0, -1))
+        all_dumps = list(result.dumps)
+
+        for _ in range(max_retries):
+            if not result.skipped:
+                break
+            time.sleep(retry_delay)
+            retry_ids = [entry["id"] for entry in result.skipped]
+            result = self.__scrape_ids(last_id, retry_ids)
+            all_dumps.extend(result.dumps)
+
+        return ScrapeResult(
+            dumps=sorted(all_dumps, key=lambda d: d["id"], reverse=True),
+            skipped=result.skipped,
+        )

@@ -4,6 +4,7 @@ from wdumper_scraper.recent_dumps_page import RecentDumpsPage
 from wdumper_scraper.dump_info_page import DumpInfoPage
 from wdumper_scraper.dump_info import DumpInfo
 from wdumper_scraper.dumps_info_loader import DumpsInfoLoader, ScrapeResult
+from wdumper_scraper.cached_limiter_session import CachedLimiterSession
 
 __all__ = [
     'Scraper',
@@ -16,4 +17,5 @@ __all__ = [
     'DumpInfo',
     'DumpsInfoLoader',
     'ScrapeResult',
+    'CachedLimiterSession',
 ]

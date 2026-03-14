@@ -1,21 +1,19 @@
 from enum import Enum
-from requests_cache import CachedSession
 from requests.exceptions import RequestException
 from bs4 import BeautifulSoup
 
+from wdumper_scraper.cached_limiter_session import CachedLimiterSession
 from wdumper_scraper.exceptions import ScraperError
 
 __all__ = ['Scraper', 'CacheDuration']
-
 
 class CacheDuration(Enum):
     NO_CACHE = 0
     SHORT = 7200
     INDEFINITE = None
 
-
 class Scraper:
-    def __init__(self, session: CachedSession, log: bool = False) -> None:
+    def __init__(self, session: CachedLimiterSession, log: bool = False) -> None:
         self.__session = session
         self.__log = log
 
@@ -44,4 +42,3 @@ class Scraper:
     ) -> BeautifulSoup:
         html = self.__get(url, cache_duration)
         return BeautifulSoup(html, 'html.parser')
-

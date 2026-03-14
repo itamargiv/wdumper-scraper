@@ -6,7 +6,9 @@ build-backend = "setuptools.build_meta"
 name = "wdumper-scraper"
 version = "0.1.0"
 dependencies = [
+    "requests",
     "requests-cache",
+    "requests-ratelimiter",
     "beautifulsoup4",
 ]
 
@@ -20,4 +22,3 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
