@@ -1,18 +1,5 @@
 import pytest
-from wdumper_scraper import Scraper
-
-
-@pytest.fixture
-def make_page(mocker):
-    def factory(dump_id=42, name="My Dump", url="https://wdumps.toolforge.org/dump/42", spec=None):
-        page = mocker.MagicMock()
-        page.dump_id = dump_id
-        page.url = url
-        page.extract_name.return_value = name
-        page.extract_spec.return_value = spec
-        return page
-
-    return factory
+from wdumper_scraper import Scraper, WDumperClient, WDumperClients
 
 
 @pytest.fixture
@@ -29,3 +16,29 @@ def make_scraper(mocker):
 
     return factory
 
+
+@pytest.fixture
+def make_client(mocker):
+    def factory(status_code=200, json_data=None):
+        if json_data is None:
+            json_data = {"dump": {"id": 42, "title": "My Dump", "spec": {"labels": True}}}
+
+        mock_response = mocker.MagicMock()
+        mock_response.status_code = status_code
+        mock_response.json.return_value = json_data
+
+        mock_session = mocker.MagicMock()
+        mock_session.get.return_value = mock_response
+
+        return WDumperClient(mock_session), mock_session
+
+    return factory
+
+
+@pytest.fixture
+def make_clients(mocker):
+    def factory():
+        mock_session = mocker.MagicMock()
+        return WDumperClients(mock_session)
+
+    return factory

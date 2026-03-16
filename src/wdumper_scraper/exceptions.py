@@ -12,3 +12,6 @@ class ScraperError(WDumperError):
 class PageError(WDumperError):
     pass
 
+
+class ClientError(WDumperError):
+    pass

@@ -1,29 +1,27 @@
-from typing import Any
-
-from wdumper_scraper.dump_page import DumpPage
+from typing import Literal
+from wdumper_scraper.wdumper_client import Dump
 
 __all__ = ["DumpInfo"]
 
+FilterKey = Literal["labels", "descriptions", "aliases", "sitelinks"]
+
 class DumpInfo:
-    def __init__(self, page: DumpPage):
-        self.__page = page
-        self.__spec = self.__page.extract_spec()
+    def __init__(self, url, dump: Dump):
+        self.__dump = dump
+        self.__spec = dump["spec"]
         self.__data = {
-            "id": page.dump_id,
-            "name": page.extract_name(),
-            "url": page.url,
+            "id": dump["id"],
+            "name": dump["title"],
+            "url": url,
             **self.__map_filters()
         }
 
     @property
-    def data(self) -> dict[str, Any]:
+    def data(self) -> dict[str, str | int]:
         return self.__data
 
-    def __map_filters(self) -> dict[str, str]:
-        if not self.__spec:
-            return {}
-
-        filter_keys = ["labels", "descriptions", "aliases", "sitelinks"]
+    def __map_filters(self):
+        filter_keys: list[FilterKey] = ["labels", "descriptions", "aliases", "sitelinks"]
 
         return {
             key: "yes" if self.__spec[key] else "no" for key in filter_keys

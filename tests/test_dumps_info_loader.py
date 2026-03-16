@@ -6,7 +6,7 @@ RETRY_DELAY = 5.0
 
 
 @pytest.fixture
-def make_loader(make_scraper, make_page, mocker):
+def make_loader(make_clients, mocker):
     def factory(last_id=LAST_ID, fails_on: dict[int, Exception | int] = None):
         """
         fails_on: mapping of dump_id → failure behaviour.
@@ -16,7 +16,7 @@ def make_loader(make_scraper, make_page, mocker):
         fails_on = fails_on or {}
         call_counts = {}
 
-        scraper = make_scraper()
+        clients = make_clients()
 
         mock_recent_page = mocker.MagicMock()
         mock_recent_page.extract_last_id.return_value = last_id
@@ -25,7 +25,7 @@ def make_loader(make_scraper, make_page, mocker):
             return_value=mock_recent_page,
         )
 
-        def make_dump_page(scraper, dump_id, cache_duration):
+        def get_dump_side_effect(dump_id, cache_duration):
             effect = fails_on.get(dump_id)
             if isinstance(effect, Exception):
                 raise effect
@@ -33,19 +33,19 @@ def make_loader(make_scraper, make_page, mocker):
                 call_counts[dump_id] = call_counts.get(dump_id, 0) + 1
                 if call_counts[dump_id] <= effect:
                     raise ScraperError(f"Transient error on {dump_id}")
-            return make_page(
-                dump_id=dump_id,
-                name=f"Dump {dump_id}",
-                url=f"http://example.com/dump/{dump_id}",
+            return (
+                f"http://example.com/dump/{dump_id}",
+                {
+                    "id": dump_id,
+                    "title": f"Dump {dump_id}",
+                    "spec": {"labels": True, "descriptions": True, "aliases": True, "sitelinks": True},
+                },
             )
 
-        mocker.patch(
-            "wdumper_scraper.dumps_info_loader.DumpPage",
-            side_effect=make_dump_page,
-        )
+        mocker.patch.object(clients.wdumper, "get_dump", side_effect=get_dump_side_effect)
         mock_sleep = mocker.patch("wdumper_scraper.dumps_info_loader.time.sleep")
 
-        return DumpsInfoLoader(scraper), mock_sleep
+        return DumpsInfoLoader(clients), mock_sleep
 
     return factory
 

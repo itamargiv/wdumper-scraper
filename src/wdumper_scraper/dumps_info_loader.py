@@ -2,30 +2,35 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import NamedTuple, Any
 from wdumper_scraper.dump_info import DumpInfo
-from wdumper_scraper.dump_page import DumpPage
 from wdumper_scraper.exceptions import WDumperError
 from wdumper_scraper.recent_dumps_page import RecentDumpsPage
-from wdumper_scraper.scraper import CacheDuration, Scraper
+from wdumper_scraper.scraper import CacheDuration
+from wdumper_scraper.wdumper_clients import WDumperClients
+
 
 __all__ = ["DumpsInfoLoader", "ScrapeResult"]
+
 
 class ScrapeResult(NamedTuple):
     dumps: list[dict[str, Any]]
     skipped: list[dict[str, Any]]
 
 class DumpsInfoLoader:
-    def __init__(self, scraper: Scraper, max_workers: int = 5) -> None:
-        self.__scraper = scraper
+    def __init__(self, clients: WDumperClients, max_workers: int = 5) -> None:
+        self.__scraper = clients.scraper
+        self.__wdumper = clients.wdumper
         self.__max_workers = max_workers
 
-    def __scrape_dump(self, last_id: int, dump_id: int) -> DumpInfo:
+
+    def __get_dump(self, last_id: int, dump_id: int) -> DumpInfo:
         cache_duration = (
             CacheDuration.INDEFINITE
             if dump_id < last_id - 10
             else CacheDuration.SHORT
         )
-        dump_page = DumpPage(self.__scraper, dump_id, cache_duration)
-        return DumpInfo(dump_page)
+
+        url, dump = self.__wdumper.get_dump(dump_id, cache_duration)
+        return DumpInfo(url, dump)
 
     def __scrape_ids(self, last_id: int, ids) -> ScrapeResult:
         dumps = []
@@ -33,7 +38,7 @@ class DumpsInfoLoader:
 
         with ThreadPoolExecutor(max_workers=self.__max_workers) as executor:
             futures = {
-                executor.submit(self.__scrape_dump, last_id, i): i
+                executor.submit(self.__get_dump, last_id, i): i
                 for i in ids
             }
 
