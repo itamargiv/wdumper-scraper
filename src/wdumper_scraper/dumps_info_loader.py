@@ -2,7 +2,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import NamedTuple, Any
 from wdumper_scraper.dump_info import DumpInfo
-from wdumper_scraper.dump_info_page import DumpInfoPage
+from wdumper_scraper.dump_page import DumpPage
 from wdumper_scraper.exceptions import WDumperError
 from wdumper_scraper.recent_dumps_page import RecentDumpsPage
 from wdumper_scraper.scraper import CacheDuration, Scraper
@@ -24,8 +24,8 @@ class DumpsInfoLoader:
             if dump_id < last_id - 10
             else CacheDuration.SHORT
         )
-        dump_info_page = DumpInfoPage(self.__scraper, dump_id, cache_duration)
-        return DumpInfo(dump_info_page)
+        dump_page = DumpPage(self.__scraper, dump_id, cache_duration)
+        return DumpInfo(dump_page)
 
     def __scrape_ids(self, last_id: int, ids) -> ScrapeResult:
         dumps = []

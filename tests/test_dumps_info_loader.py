@@ -25,7 +25,7 @@ def make_loader(make_scraper, make_page, mocker):
             return_value=mock_recent_page,
         )
 
-        def make_dump_info_page(scraper, dump_id, cache_duration):
+        def make_dump_page(scraper, dump_id, cache_duration):
             effect = fails_on.get(dump_id)
             if isinstance(effect, Exception):
                 raise effect
@@ -40,8 +40,8 @@ def make_loader(make_scraper, make_page, mocker):
             )
 
         mocker.patch(
-            "wdumper_scraper.dumps_info_loader.DumpInfoPage",
-            side_effect=make_dump_info_page,
+            "wdumper_scraper.dumps_info_loader.DumpPage",
+            side_effect=make_dump_page,
         )
         mock_sleep = mocker.patch("wdumper_scraper.dumps_info_loader.time.sleep")
 

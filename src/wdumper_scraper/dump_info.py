@@ -1,11 +1,11 @@
 from typing import Any
 
-from wdumper_scraper.dump_info_page import DumpInfoPage
+from wdumper_scraper.dump_page import DumpPage
 
 __all__ = ["DumpInfo"]
 
 class DumpInfo:
-    def __init__(self, page: DumpInfoPage):
+    def __init__(self, page: DumpPage):
         self.__page = page
         self.__spec = self.__page.extract_spec()
         self.__data = {
