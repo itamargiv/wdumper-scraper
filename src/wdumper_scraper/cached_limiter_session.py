@@ -2,7 +2,7 @@ from requests import Session
 from requests_cache import CacheMixin
 from requests_ratelimiter import LimiterMixin
 
-__all__ = ['CachedLimiterSession']
+__all__ = ["CachedLimiterSession"]
 
 class CachedLimiterSession(CacheMixin, LimiterMixin, Session):
     def __init__(self, *args, user_agent: str | None = None, **kwargs):

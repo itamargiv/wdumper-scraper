@@ -2,7 +2,7 @@ from typing import Any
 
 from wdumper_scraper.dump_info_page import DumpInfoPage
 
-__all__ = ['DumpInfo']
+__all__ = ["DumpInfo"]
 
 class DumpInfo:
     def __init__(self, page: DumpInfoPage):
@@ -26,6 +26,6 @@ class DumpInfo:
         filter_keys = ["labels", "descriptions", "aliases", "sitelinks"]
 
         return {
-            key: 'yes' if self.__spec[key] else 'no' for key in filter_keys
+            key: "yes" if self.__spec[key] else "no" for key in filter_keys
         }
 

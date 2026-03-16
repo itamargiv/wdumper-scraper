@@ -3,7 +3,7 @@ import json
 from wdumper_scraper.exceptions import PageError
 from wdumper_scraper.scraper import Scraper, CacheDuration
 
-__all__ = ['DumpInfoPage']
+__all__ = ["DumpInfoPage"]
 
 class DumpInfoPage:
     def __init__(

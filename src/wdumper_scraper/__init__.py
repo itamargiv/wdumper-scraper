@@ -7,15 +7,15 @@ from wdumper_scraper.dumps_info_loader import DumpsInfoLoader, ScrapeResult
 from wdumper_scraper.cached_limiter_session import CachedLimiterSession
 
 __all__ = [
-    'Scraper',
-    'CacheDuration',
-    'WDumperError',
-    'ScraperError',
-    'PageError',
-    'RecentDumpsPage',
-    'DumpInfoPage',
-    'DumpInfo',
-    'DumpsInfoLoader',
-    'ScrapeResult',
-    'CachedLimiterSession',
+    "Scraper",
+    "CacheDuration",
+    "WDumperError",
+    "ScraperError",
+    "PageError",
+    "RecentDumpsPage",
+    "DumpInfoPage",
+    "DumpInfo",
+    "DumpsInfoLoader",
+    "ScrapeResult",
+    "CachedLimiterSession",
 ]

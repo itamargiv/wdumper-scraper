@@ -6,7 +6,7 @@ WITH_H2_HTML = "<h2>My Dump</h2><p>some content</p>"
 WITHOUT_H2_HTML = "<p>some content</p>"
 WITH_SPEC_HTML = '<h2>Spec</h2><pre>{"key": "value"}</pre>'
 WITH_SPEC_HEADING_BUT_NO_PRE_HTML = "<h2>Spec</h2>"
-INVALID_JSON_SPEC_HTML = '<h2>Spec</h2><pre>not valid json</pre>'
+INVALID_JSON_SPEC_HTML = "<h2>Spec</h2><pre>not valid json</pre>"
 
 
 def test_scrape_called_with_correct_url(make_scraper, mocker):

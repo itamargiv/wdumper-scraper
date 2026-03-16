@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from wdumper_scraper.cached_limiter_session import CachedLimiterSession
 from wdumper_scraper.exceptions import ScraperError
 
-__all__ = ['Scraper', 'CacheDuration']
+__all__ = ["Scraper", "CacheDuration"]
 
 class CacheDuration(Enum):
     NO_CACHE = 0
@@ -41,4 +41,4 @@ class Scraper:
             cache_duration: CacheDuration = CacheDuration.NO_CACHE
     ) -> BeautifulSoup:
         html = self.__get(url, cache_duration)
-        return BeautifulSoup(html, 'html.parser')
+        return BeautifulSoup(html, "html.parser")
