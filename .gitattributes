@@ -1,3 +1,4 @@
 *.ipynb filter=nbstripout
 *.zpln filter=nbstripout
 *.ipynb diff=ipynb
+cache/scraper_cache.sqlite filter=lfs diff=lfs merge=lfs -text

@@ -1,6 +1,10 @@
 .idea
-cache
 *.sqlite
+cache/*
+!cache/.gitkeep
+!cache/scraper_cache.sqlite
+data/*
+!data/.gitkeep
 
 **/__pycache__/
 *.egg-info/

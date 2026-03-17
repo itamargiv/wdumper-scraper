@@ -37,6 +37,7 @@ wdumper-scraper/
 ## Prerequisites
 
 - Python 3.10+
+- [git-lfs](https://git-lfs.com/)
 
 ## Local Setup
 
@@ -44,6 +45,7 @@ wdumper-scraper/
    ```bash
    git clone https://github.com/itamargiv/wdumper-scraper.git
    cd wdumper-scraper
+   git lfs pull
    ```
 
 2. **Create and activate a virtual environment**
