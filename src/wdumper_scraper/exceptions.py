@@ -1,4 +1,4 @@
-__all__ = ["WDumperError", "ScraperError", "PageError"]
+__all__ = ["WDumperError", "ScraperError", "PageError", "ClientError"]
 
 
 class WDumperError(Exception):
