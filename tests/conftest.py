@@ -1,5 +1,5 @@
 import pytest
-from wdumper_scraper import Scraper, WDumperClient, WDumperClients
+from wdumper_scraper import Scraper, WDumperClient
 
 
 @pytest.fixture
@@ -38,7 +38,8 @@ def make_client(mocker):
 @pytest.fixture
 def make_clients(mocker):
     def factory():
-        mock_session = mocker.MagicMock()
-        return WDumperClients(mock_session)
+        mock_scraper = mocker.MagicMock(spec=Scraper)
+        mock_wdumper = mocker.MagicMock(spec=WDumperClient)
+        return mock_scraper, mock_wdumper
 
     return factory

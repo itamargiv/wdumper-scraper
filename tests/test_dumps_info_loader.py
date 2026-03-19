@@ -16,7 +16,7 @@ def make_loader(make_clients, mocker):
         fails_on = fails_on or {}
         call_counts = {}
 
-        clients = make_clients()
+        scraper, wdumper = make_clients()
 
         mock_recent_page = mocker.MagicMock()
         mock_recent_page.extract_last_id.return_value = last_id
@@ -42,10 +42,10 @@ def make_loader(make_clients, mocker):
                 },
             )
 
-        mocker.patch.object(clients.wdumper, "get_dump", side_effect=get_dump_side_effect)
-        mock_sleep = mocker.patch("wdumper_scraper.dumps_info_loader.time.sleep")
+        mocker.patch.object(wdumper, "get_dump", side_effect=get_dump_side_effect)
+        mock_sleep = mocker.patch("wdumper_scraper.scrape_reporter.time.sleep")
 
-        return DumpsInfoLoader(clients), mock_sleep
+        return DumpsInfoLoader(scraper, wdumper), mock_sleep
 
     return factory
 

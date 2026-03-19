@@ -1,6 +1,8 @@
 import time
-from tqdm.auto import tqdm
+
 from IPython.display import display, Markdown, clear_output
+from tqdm.auto import tqdm
+
 from wdumper_scraper.scrape_result import ScrapeResult
 
 __all__ = ["NullReporter", "ScrapeReporter"]

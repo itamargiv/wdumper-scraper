@@ -1,8 +1,8 @@
 import json
 import logging
-from typing import TypedDict, Any
 
 from requests import RequestException
+from typing import TypedDict, Any
 
 from wdumper_scraper.scraper import CacheDuration
 from wdumper_scraper.cached_limiter_session import CachedLimiterSession

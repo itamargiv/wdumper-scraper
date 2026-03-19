@@ -1,4 +1,5 @@
 from typing import Literal
+
 from wdumper_scraper.wdumper_client import Dump
 
 __all__ = ["DumpInfo"]

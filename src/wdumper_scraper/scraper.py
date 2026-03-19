@@ -1,7 +1,8 @@
 import logging
+
+from bs4 import BeautifulSoup
 from enum import Enum
 from requests.exceptions import RequestException
-from bs4 import BeautifulSoup
 
 from wdumper_scraper.cached_limiter_session import CachedLimiterSession
 from wdumper_scraper.exceptions import ScraperError

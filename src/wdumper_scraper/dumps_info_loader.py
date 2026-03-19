@@ -1,21 +1,28 @@
 import math
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
 from wdumper_scraper.dump_info import DumpInfo
 from wdumper_scraper.exceptions import WDumperError
 from wdumper_scraper.recent_dumps_page import RecentDumpsPage
-from wdumper_scraper.scrape_result import ScrapeResult
-from wdumper_scraper.scraper import CacheDuration
 from wdumper_scraper.scrape_reporter import NullReporter
-from wdumper_scraper.wdumper_clients import WDumperClients
+from wdumper_scraper.scrape_result import ScrapeResult
+from wdumper_scraper.scraper import Scraper, CacheDuration
+from wdumper_scraper.wdumper_client import WDumperClient
 
 
 __all__ = ["DumpsInfoLoader"]
 
 
 class DumpsInfoLoader:
-    def __init__(self, clients: WDumperClients, max_workers: int = 5, reporter: NullReporter = NullReporter()) -> None:
-        self.__scraper = clients.scraper
-        self.__wdumper = clients.wdumper
+    def __init__(
+            self,
+            scraper: Scraper,
+            wdumper: WDumperClient,
+            max_workers: int = 5,
+            reporter: NullReporter = NullReporter()
+    ) -> None:
+        self.__scraper = scraper
+        self.__wdumper = wdumper
         self.__max_workers = max_workers
         self.__reporter = reporter
 
