@@ -1,3 +1,4 @@
+import logging
 from enum import Enum
 from requests.exceptions import RequestException
 from bs4 import BeautifulSoup
@@ -5,6 +6,7 @@ from bs4 import BeautifulSoup
 from wdumper_scraper.cached_limiter_session import CachedLimiterSession
 from wdumper_scraper.exceptions import ScraperError
 
+logger = logging.getLogger(__name__)
 __all__ = ["Scraper", "CacheDuration"]
 
 class CacheDuration(Enum):
@@ -13,9 +15,8 @@ class CacheDuration(Enum):
     INDEFINITE = None
 
 class Scraper:
-    def __init__(self, session: CachedLimiterSession, log: bool = False) -> None:
+    def __init__(self, session: CachedLimiterSession) -> None:
         self.__session = session
-        self.__log = log
 
     def __get(
             self,
@@ -27,8 +28,7 @@ class Scraper:
         except RequestException as e:
             raise ScraperError(str(e)) from e
 
-        if self.__log:
-            print(f"Cache {'HIT' if response.from_cache else 'MISS'} for URL: {url}")
+        logger.debug(f"Cache {'HIT' if response.from_cache else 'MISS'} for URL: {url}")
 
         if response.status_code != 200:
             raise ScraperError(f"Status Code: {response.status_code}")

@@ -10,6 +10,8 @@ dependencies = [
     "requests-cache",
     "requests-ratelimiter",
     "beautifulsoup4",
+    "tqdm[notebook]",
+    "ipython"
 ]
 
 [project.optional-dependencies]

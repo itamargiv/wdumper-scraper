@@ -1,4 +1,5 @@
 import json
+import logging
 from typing import TypedDict, Any
 
 from requests import RequestException
@@ -7,7 +8,7 @@ from wdumper_scraper.scraper import CacheDuration
 from wdumper_scraper.cached_limiter_session import CachedLimiterSession
 from wdumper_scraper.exceptions import ClientError
 
-
+logger = logging.getLogger(__name__)
 __all__ = ["WDumperClient", "Dump"]
 
 class DumpSpec(TypedDict):
@@ -22,9 +23,8 @@ class Dump(TypedDict):
     spec: DumpSpec
 
 class WDumperClient:
-    def __init__(self, session: CachedLimiterSession, log: bool = False) -> None:
+    def __init__(self, session: CachedLimiterSession) -> None:
         self.__session = session
-        self.__log = log
         self.__base_url = "https://wdumps.toolforge.org"
 
     def __get(
@@ -41,8 +41,7 @@ class WDumperClient:
         except RequestException as e:
             raise ClientError(str(e)) from e
 
-        if self.__log:
-            print(f"Cache {'HIT' if response.from_cache else 'MISS'} for URL: {url}")
+        logger.debug(f"Cache {'HIT' if response.from_cache else 'MISS'} for URL: {url}")
 
         if response.status_code != 200:
             raise ClientError(f"Status Code: {response.status_code}")
