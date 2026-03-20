@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 __all__ = ["WDumperClient", "Dump"]
 
 class DumpSpec(TypedDict):
+    languages: list[str] | None
     labels: bool
     descriptions: bool
     aliases: bool
