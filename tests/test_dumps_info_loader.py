@@ -20,7 +20,7 @@ def make_loader(make_clients, mocker):
 
         mock_recent_page = mocker.MagicMock()
         mock_recent_page.extract_last_id.return_value = last_id
-        mocker.patch(
+        mock_rdp_class = mocker.patch(
             "wdumper_scraper.dumps_info_loader.RecentDumpsPage",
             return_value=mock_recent_page,
         )
@@ -45,20 +45,20 @@ def make_loader(make_clients, mocker):
         mocker.patch.object(wdumper, "get_dump", side_effect=get_dump_side_effect)
         mock_sleep = mocker.patch("wdumper_scraper.scrape_reporter.time.sleep")
 
-        return DumpsInfoLoader(scraper, wdumper), mock_sleep
+        return DumpsInfoLoader(scraper, wdumper), mock_sleep, mock_rdp_class
 
     return factory
 
 
 def test_scrape_attempts_all_ids(make_loader):
-    loader, _ = make_loader(last_id=LAST_ID)
+    loader, *_ = make_loader(last_id=LAST_ID)
     result = loader.scrape()
     scraped_ids = {dump["id"] for dump in result.dumps}
     assert scraped_ids == set(range(1, LAST_ID + 1))
 
 
 def test_scrape_successful_dumps_appear_in_dumps(make_loader):
-    loader, _ = make_loader(last_id=LAST_ID)
+    loader, *_ = make_loader(last_id=LAST_ID)
     result = loader.scrape()
     assert len(result.dumps) == LAST_ID
     assert len(result.skipped) == 0
@@ -66,7 +66,7 @@ def test_scrape_successful_dumps_appear_in_dumps(make_loader):
 
 def test_scrape_exception_populates_skipped(make_loader):
     error = ScraperError("Not found")
-    loader, _ = make_loader(last_id=LAST_ID, fails_on={2: error})
+    loader, *_ = make_loader(last_id=LAST_ID, fails_on={2: error})
     result = loader.scrape()
     assert len(result.dumps) == LAST_ID - 1
     assert len(result.skipped) == 1
@@ -75,13 +75,13 @@ def test_scrape_exception_populates_skipped(make_loader):
 
 
 def test_scrape_skipped_contains_id_and_error_keys(make_loader):
-    loader, _ = make_loader(last_id=1, fails_on={1: ScraperError("boom")})
+    loader, *_ = make_loader(last_id=1, fails_on={1: ScraperError("boom")})
     result = loader.scrape()
     assert set(result.skipped[0].keys()) == {"id", "error"}
 
 
 def test_repeated_scrape_calls_produce_independent_results(make_loader):
-    loader, _ = make_loader(last_id=LAST_ID)
+    loader, *_ = make_loader(last_id=LAST_ID)
     result1 = loader.scrape()
     result2 = loader.scrape()
     assert result1 is not result2
@@ -90,14 +90,14 @@ def test_repeated_scrape_calls_produce_independent_results(make_loader):
 
 
 def test_scrape_dumps_are_sorted_by_id_descending(make_loader):
-    loader, _ = make_loader(last_id=LAST_ID)
+    loader, *_ = make_loader(last_id=LAST_ID)
     result = loader.scrape()
     ids = [dump["id"] for dump in result.dumps]
     assert ids == sorted(ids, reverse=True)
 
 
 def test_scrape_skipped_are_sorted_by_id_descending(make_loader):
-    loader, _ = make_loader(last_id=LAST_ID, fails_on={i: ScraperError("boom") for i in range(1, LAST_ID + 1)})
+    loader, *_ = make_loader(last_id=LAST_ID, fails_on={i: ScraperError("boom") for i in range(1, LAST_ID + 1)})
     result = loader.scrape()
     ids = [entry["id"] for entry in result.skipped]
     assert ids == sorted(ids, reverse=True)
@@ -106,7 +106,7 @@ def test_scrape_skipped_are_sorted_by_id_descending(make_loader):
 # --- retry ---
 
 def test_scrape_recovers_skipped_ids(make_loader):
-    loader, _ = make_loader(last_id=LAST_ID, fails_on={2: 1})
+    loader, *_ = make_loader(last_id=LAST_ID, fails_on={2: 1})
     result = loader.scrape(max_retries=1, retry_delay=RETRY_DELAY)
     scraped_ids = {dump["id"] for dump in result.dumps}
     assert scraped_ids == set(range(1, LAST_ID + 1))
@@ -114,7 +114,7 @@ def test_scrape_recovers_skipped_ids(make_loader):
 
 
 def test_scrape_exhausted_retries_remain_in_skipped(make_loader):
-    loader, _ = make_loader(last_id=LAST_ID, fails_on={2: 99})
+    loader, *_ = make_loader(last_id=LAST_ID, fails_on={2: 99})
     result = loader.scrape(max_retries=3, retry_delay=RETRY_DELAY)
     skipped_ids = [entry["id"] for entry in result.skipped]
     assert skipped_ids == [2]
@@ -124,20 +124,49 @@ def test_scrape_exhausted_retries_remain_in_skipped(make_loader):
 
 def test_scrape_sleep_called_once_per_retry_pass(make_loader):
     # ID 2 fails on passes 1 and 2, recovers on pass 3 → 2 sleeps
-    loader, mock_sleep = make_loader(last_id=LAST_ID, fails_on={2: 2})
+    loader, mock_sleep, _ = make_loader(last_id=LAST_ID, fails_on={2: 2})
     loader.scrape(max_retries=3, retry_delay=RETRY_DELAY)
     assert mock_sleep.call_count == 2
     mock_sleep.assert_called_with(RETRY_DELAY)
 
 
 def test_scrape_no_sleep_when_no_failures(make_loader):
-    loader, mock_sleep = make_loader(last_id=LAST_ID)
+    loader, mock_sleep, _ = make_loader(last_id=LAST_ID)
     loader.scrape(retry_delay=RETRY_DELAY)
     mock_sleep.assert_not_called()
 
 
 def test_scrape_merged_dumps_sorted_by_id_descending(make_loader):
-    loader, _ = make_loader(last_id=LAST_ID, fails_on={2: 1})
+    loader, *_ = make_loader(last_id=LAST_ID, fails_on={2: 1})
     result = loader.scrape(retry_delay=RETRY_DELAY)
     ids = [dump["id"] for dump in result.dumps]
     assert ids == sorted(ids, reverse=True)
+
+
+# --- last_id parameter ---
+
+def test_scrape_explicit_last_id_uses_provided_value(make_loader):
+    explicit_last_id = LAST_ID + 2
+    loader, *_ = make_loader(last_id=LAST_ID)
+    result = loader.scrape(last_id=explicit_last_id)
+    scraped_ids = {dump["id"] for dump in result.dumps}
+    assert scraped_ids == set(range(1, explicit_last_id + 1))
+
+
+def test_scrape_explicit_last_id_skips_recent_dumps_page(make_loader):
+    loader, _, mock_rdp_class = make_loader(last_id=LAST_ID)
+    loader.scrape(last_id=LAST_ID)
+    mock_rdp_class.assert_not_called()
+
+
+def test_scrape_without_explicit_last_id_calls_recent_dumps_page(make_loader):
+    loader, _, mock_rdp_class = make_loader(last_id=LAST_ID)
+    loader.scrape()
+    mock_rdp_class.assert_called_once()
+
+
+def test_scrape_zero_last_id_calls_recent_dumps_page(make_loader):
+    loader, _, mock_rdp_class = make_loader(last_id=LAST_ID)
+    loader.scrape(last_id=0)
+    mock_rdp_class.assert_called_once()
+

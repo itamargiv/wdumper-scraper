@@ -68,8 +68,17 @@ class DumpsInfoLoader:
             skipped=sorted(skipped, key=lambda s: s["id"], reverse=True),
         )
 
-    def scrape(self, max_retries: int = 0, retry_delay: float = 5.0) -> ScrapeResult:
-        last_id = RecentDumpsPage(self.__scraper).extract_last_id()
+    def scrape(
+            self,
+            max_retries: int = 0,
+            retry_delay: float = 5.0,
+            last_id: int = 0,
+    ) -> ScrapeResult:
+        last_id = (
+            RecentDumpsPage(self.__scraper).extract_last_id()
+            if last_id < 1
+            else last_id
+        )
         result = self.__scrape_ids(last_id, range(last_id, 0, -1))
         all_dumps = list(result.dumps)
 

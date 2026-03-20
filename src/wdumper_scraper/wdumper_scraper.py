@@ -25,6 +25,8 @@ class WDumperScraper:
             retry_delay: int = 5,
             timeout: int = 10,
             per_second: int = 10,
+            read_only: bool = False,
+            last_id: int = 0,
             debug: bool = False
     ) -> None:
         if not user_agent:
@@ -36,8 +38,10 @@ class WDumperScraper:
         self.__cache_path = cache_path
         self.__per_second = per_second
         self.__max_workers = max_workers
-        self.__max_retries = max_retries
+        self.__max_retries = 0 if read_only else max_retries
         self.__retry_delay = retry_delay
+        self.__read_only = read_only
+        self.__last_id = 100 if read_only and last_id < 1 else last_id
         self.__debug = debug
         self.__reporter = self.__make_reporter()
         self.__loader = self.__make_loader()
@@ -50,6 +54,8 @@ class WDumperScraper:
             timeout=self.__timeout,
             cache_name=f"{cache_path}/cache/scraper_cache",
             backend="sqlite",
+            read_only=self.__read_only,
+            only_if_cached=self.__read_only,
             ignored_parameters=["Accept-Encoding"],
             bucket_class=SQLiteBucket,
             per_second=self.__per_second,
@@ -87,6 +93,7 @@ class WDumperScraper:
         result = self.__loader.scrape(
             max_retries=self.__max_retries,
             retry_delay=self.__retry_delay,
+            last_id=self.__last_id
         )
 
         self.__reporter.report(result)
