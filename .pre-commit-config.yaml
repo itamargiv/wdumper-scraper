@@ -4,4 +4,12 @@ repos:
     hooks:
       - id: nbstripout
         args: ["--keep-id", "--extra-keys", "cell.metadata.id"]
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: pytest
+        language: system
+        pass_filenames: false
+        files: \.py$
 
