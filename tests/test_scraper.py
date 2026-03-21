@@ -4,7 +4,8 @@ import pytest
 from pytest_mock import MockerFixture
 from requests.exceptions import RequestException
 
-from wdumper_scraper import Scraper, ScraperError
+from wdumper_scraper.exceptions import ScraperError
+from wdumper_scraper.scraper import Scraper
 
 
 def test_scrape_parses_html(make_scraper: Callable[..., Scraper]) -> None:

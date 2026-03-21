@@ -4,14 +4,10 @@ from unittest.mock import MagicMock
 import pytest
 from pytest_mock import MockerFixture
 
-from wdumper_scraper import (
-    DumpsInfoLoader,
-    Scraper,
-    ScraperError,
-    WDumperClient,
-)
-from wdumper_scraper.scraper import CacheDuration
-from wdumper_scraper.wdumper_client import Dump, DumpSpec
+from wdumper_scraper.dumps_info_loader import DumpsInfoLoader
+from wdumper_scraper.exceptions import ScraperError
+from wdumper_scraper.scraper import CacheDuration, Scraper
+from wdumper_scraper.wdumper_client import Dump, DumpSpec, WDumperClient
 
 LAST_ID = 3
 RETRY_DELAY = 5.0

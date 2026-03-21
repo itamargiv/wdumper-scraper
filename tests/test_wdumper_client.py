@@ -5,7 +5,9 @@ from unittest.mock import MagicMock
 import pytest
 from requests.exceptions import RequestException
 
-from wdumper_scraper import CacheDuration, ClientError, WDumperClient
+from wdumper_scraper.exceptions import ClientError
+from wdumper_scraper.scraper import CacheDuration
+from wdumper_scraper.wdumper_client import WDumperClient
 
 DUMP_ID = 42
 BASE_URL = "https://wdumps.toolforge.org"

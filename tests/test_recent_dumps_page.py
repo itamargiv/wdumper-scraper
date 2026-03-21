@@ -3,7 +3,9 @@ from collections.abc import Callable
 import pytest
 from pytest_mock import MockerFixture
 
-from wdumper_scraper import PageError, RecentDumpsPage, Scraper, ScraperError
+from wdumper_scraper.exceptions import PageError, ScraperError
+from wdumper_scraper.recent_dumps_page import RecentDumpsPage
+from wdumper_scraper.scraper import Scraper
 
 SINGLE_ROW_HTML = (
     '<table><tr><td><a href="/dump/42">Dump 42</a></td></tr></table>'

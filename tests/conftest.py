@@ -5,7 +5,8 @@ from unittest.mock import MagicMock
 import pytest
 from pytest_mock import MockerFixture
 
-from wdumper_scraper import Scraper, WDumperClient
+from wdumper_scraper.scraper import Scraper
+from wdumper_scraper.wdumper_client import WDumperClient
 
 
 @pytest.fixture
