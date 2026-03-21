@@ -59,9 +59,9 @@ wdumper-scraper/
    pip install -e ".[dev]"
    ```
 
-4. **Install the git filter to strip notebook outputs before commits**
+4. **Install the pre-commit hooks**
    ```bash
-   nbstripout --install --attributes .gitattributes
+   pre-commit install
    ```
 
 5. **Launch the notebook**
