@@ -1,7 +1,7 @@
 import logging
-
 from importlib.metadata import version
-from requests_ratelimiter import SQLiteBucket
+
+from requests_ratelimiter import SQLiteBucket  # type: ignore[attr-defined]
 
 from wdumper_scraper.cached_limiter_session import CachedLimiterSession
 from wdumper_scraper.dumps_info_loader import DumpsInfoLoader
@@ -15,19 +15,20 @@ __all__ = ["WDumperScraper"]
 _PACKAGE_NAME = "wdumper-scraper"
 _REPO_URL = "https://github.com/wdumper/wdumper-scraper"
 
+
 class WDumperScraper:
     def __init__(
-            self,
-            cache_path: str = ".",
-            user_agent: str | None = None,
-            max_workers: int = 5,
-            max_retries: int = 0,
-            retry_delay: int = 5,
-            timeout: int = 10,
-            per_second: int = 10,
-            read_only: bool = False,
-            last_id: int = 0,
-            debug: bool = False
+        self,
+        cache_path: str = ".",
+        user_agent: str | None = None,
+        max_workers: int = 5,
+        max_retries: int = 0,
+        retry_delay: int = 5,
+        timeout: int = 10,
+        per_second: int = 10,
+        read_only: bool = False,
+        last_id: int = 0,
+        debug: bool = False,
     ) -> None:
         if not user_agent:
             pkg_version = version(_PACKAGE_NAME)
@@ -62,8 +63,8 @@ class WDumperScraper:
             bucket_kwargs={
                 "path": f"{cache_path}/cache/ratelimiter.sqlite",
                 "isolation_level": "EXCLUSIVE",
-                "check_same_thread": False
-            }
+                "check_same_thread": False,
+            },
         )
 
     def __make_reporter(self) -> NullReporter:
@@ -83,17 +84,14 @@ class WDumperScraper:
         scraper = Scraper(session)
         wdumper_client = WDumperClient(session)
         return DumpsInfoLoader(
-            scraper,
-            wdumper_client,
-            self.__max_workers,
-            self.__reporter
+            scraper, wdumper_client, self.__max_workers, self.__reporter
         )
 
     def run(self) -> ScrapeResult:
         result = self.__loader.scrape(
             max_retries=self.__max_retries,
             retry_delay=self.__retry_delay,
-            last_id=self.__last_id
+            last_id=self.__last_id,
         )
 
         self.__reporter.report(result)

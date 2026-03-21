@@ -4,8 +4,22 @@ repos:
     hooks:
       - id: nbstripout
         args: ["--keep-id", "--extra-keys", "cell.metadata.id"]
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.7
+    hooks:
+      - id: ruff
+        files: \.py$
+      - id: ruff-format
+        files: \.py$
   - repo: local
     hooks:
+      - id: mypy
+        name: mypy
+        entry: mypy
+        language: system
+        args: ["src/", "tests/"]
+        pass_filenames: false
+        files: \.py$
       - id: pytest
         name: pytest
         entry: pytest

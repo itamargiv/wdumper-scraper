@@ -11,8 +11,10 @@ class RecentDumpsPage:
 
     def extract_last_id(self) -> int:
         try:
-            dump_id = self.__soup.find("table").find("a")["href"].split('/')[-1]
-            return int(dump_id)
+            table = self.__soup.find("table")
+            a_tag = table.find("a") if table else None
+            href = str(a_tag["href"]) if a_tag else None
+            dump_id = href.split("/")[-1] if href else None
+            return int(dump_id)  # type: ignore[arg-type]
         except (AttributeError, TypeError, KeyError, ValueError) as e:
             raise PageError(str(e)) from e
-

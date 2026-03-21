@@ -1,4 +1,5 @@
 import math
+from collections.abc import Iterable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from wdumper_scraper.dump_info import DumpInfo
@@ -6,26 +7,24 @@ from wdumper_scraper.exceptions import WDumperError
 from wdumper_scraper.recent_dumps_page import RecentDumpsPage
 from wdumper_scraper.scrape_reporter import NullReporter
 from wdumper_scraper.scrape_result import ScrapeResult
-from wdumper_scraper.scraper import Scraper, CacheDuration
+from wdumper_scraper.scraper import CacheDuration, Scraper
 from wdumper_scraper.wdumper_client import WDumperClient
-
 
 __all__ = ["DumpsInfoLoader"]
 
 
 class DumpsInfoLoader:
     def __init__(
-            self,
-            scraper: Scraper,
-            wdumper: WDumperClient,
-            max_workers: int = 5,
-            reporter: NullReporter = NullReporter()
+        self,
+        scraper: Scraper,
+        wdumper: WDumperClient,
+        max_workers: int = 5,
+        reporter: NullReporter = NullReporter(),
     ) -> None:
         self.__scraper = scraper
         self.__wdumper = wdumper
         self.__max_workers = max_workers
         self.__reporter = reporter
-
 
     def __get_dump(self, last_id: int, dump_id: int) -> DumpInfo:
         cache_duration = (
@@ -37,17 +36,20 @@ class DumpsInfoLoader:
         url, dump = self.__wdumper.get_dump(dump_id, cache_duration)
         return DumpInfo(url, dump)
 
-    def __scrape_ids(self, last_id: int, ids, title: str = "Scraping") -> ScrapeResult:
+    def __scrape_ids(
+        self, last_id: int, ids: Iterable[int], title: str = "Scraping"
+    ) -> ScrapeResult:
         dumps = []
         skipped = []
 
         with ThreadPoolExecutor(max_workers=self.__max_workers) as executor:
             futures = {
-                executor.submit(self.__get_dump, last_id, i): i
-                for i in ids
+                executor.submit(self.__get_dump, last_id, i): i for i in ids
             }
 
-            progress_bar = self.__reporter.scrape_bar(as_completed(futures), total=len(futures), desc=title)
+            progress_bar = self.__reporter.scrape_bar(
+                as_completed(futures), total=len(futures), desc=title
+            )
 
             for future in progress_bar:
                 dump_id = futures[future]
@@ -59,7 +61,9 @@ class DumpsInfoLoader:
                 else:
                     dumps.append(dump_info.data)
 
-                progress_bar.set_postfix(scraped = len(dumps), skipped = len(skipped))
+                progress_bar.set_postfix(
+                    scraped=len(dumps), skipped=len(skipped)
+                )
 
             progress_bar.close()
 
@@ -69,10 +73,10 @@ class DumpsInfoLoader:
         )
 
     def scrape(
-            self,
-            max_retries: int = 0,
-            retry_delay: float = 5.0,
-            last_id: int = 0,
+        self,
+        max_retries: int = 0,
+        retry_delay: float = 5.0,
+        last_id: int = 0,
     ) -> ScrapeResult:
         last_id = (
             RecentDumpsPage(self.__scraper).extract_last_id()
@@ -89,7 +93,9 @@ class DumpsInfoLoader:
             self.__reporter.countdown(math.ceil(retry_delay), n, max_retries)
 
             retry_ids = [entry["id"] for entry in result.skipped]
-            result = self.__scrape_ids(last_id, retry_ids, f"Retrying (attempt {n}/{max_retries})")
+            result = self.__scrape_ids(
+                last_id, retry_ids, f"Retrying (attempt {n}/{max_retries})"
+            )
             all_dumps.extend(result.dumps)
 
         return ScrapeResult(

@@ -17,10 +17,31 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "jupyter",
+    "mypy",
     "pre-commit",
     "pytest",
     "pytest-mock",
+    "ruff",
+    "types-requests",
 ]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.ruff]
+src = ["src"]
+line-length = 80
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+]
+
+[tool.mypy]
+mypy_path = "src"
+strict = true
+ignore_missing_imports = true
+
